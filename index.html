@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bleize - Jogo de Apostas</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background-color: #282c35;
+      color: #000;
+      margin: 0;
+      padding: 0;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    #game-container, #inventory {
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 20px;
+      width: 400px;
+      margin: 10px;
+    }
+    .tab, button {
+      cursor: pointer;
+      padding: 10px;
+      margin: 5px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      display: inline-block;
+      background-color: #444;
+      color: #fff;
+    }
+    button:hover {
+      background-color: #45a049;
+    }
+    p {
+      margin: 10px 0;
+    }
+    h1, h2 {
+      color: #000;
+    }
+  </style>
+</head>
+<body>
+
+<div id="game-container">
+  <h1>Bleize - Saldo: R$<span id="saldo">100</span></h1>
+  <h2>Faça sua aposta:</h2>
+  <button onclick="apostar(20)">Apostar R$20</button>
+  <button onclick="apostar(50)">Apostar R$50</button>
+  <button onclick="apostar(80)">Apostar R$80</button>
+  <button onclick="apostar(100)">Apostar R$100</button>
+  <button onclick="apostar(1000)">Apostar R$1000</button>
+  <button onclick="apostar(10000)">Apostar R$10000</button>
+  <button onclick="apostar(100000)">Apostar R$100000</button>
+  <p id="resultado"></p>
+  <button onclick="reiniciar()">Apostar Novamente</button>
+  <button onclick="mostrarInventario()">Ver Inventário</button>
+</div>
+
+<div id="inventory">
+  <div class="tab" onclick="mostrarComprarEVender('comprar')">Comprar</div>
+  <div class="tab" onclick="mostrarComprarEVender('vender')">Vender</div>
+  <div class="tab" onclick="mostrarBonus()">Bônus</div>
+  <div class="tab" onclick="mostrarItens()">Meus Itens</div>
+  <div id="comprar" style="display: none;">
+    <h2>Comprar</h2>
+    <p>Saldo: R$<span id="saldo-inventario">100</span></p>
+    <button onclick="comprar('gol', 50000)">Comprar Gol (R$50,000)</button>
+    <button onclick="comprar('unoComEscada', 500000)">Comprar Fiat Uno com Escada (R$500,000)</button>
+    <button onclick="comprar('casaNormal', 833333)">Comprar Casa Normal (R$833,333)</button>
+    <button onclick="comprar('casaLuxo', 5000000)">Comprar Casa de Luxo (R$5,000,000)</button>
+    <button onclick="comprar('tesla', 200000)">Comprar Tesla (R$200,000)</button>
+    <button onclick="comprar('lamborghini', 1500000)">Comprar Lamborghini (R$1,500,000)</button>
+    <button onclick="comprar('ferrari', 2000000)">Comprar Ferrari (R$2,000,000)</button>
+    <button onclick="comprar('iphone', 15000)">Comprar iPhone (R$15,000)</button>
+    <button onclick="comprar('samsung', 10000)">Comprar Samsung (R$10,000)</button>
+    <button onclick="comprar('fiatUno', 50000)">Comprar Fiat Uno (R$50,000)</button>
+  </div>
+  <div id="vender" style="display: none;">
+    <h2>Vender</h2>
+    <p>Selecione um item para vender:</p>
+    <button onclick="vender('gol', 35000)">Vender Gol (R$35,000)</button>
+    <button onclick="vender('unoComEscada', 3500000)">Vender Fiat Uno com Escada (R$3,500,000)</button>
+    <button onclick="vender('casaNormal', 583333)">Vender Casa Normal (R$583,333)</button>
+    <button onclick="vender('casaLuxo', 3500000)">Vender Casa de Luxo (R$3,500,000)</button>
+    <button onclick="vender('tesla', 140000)">Vender Tesla (R$140,000)</button>
+    <button onclick="vender('lamborghini', 1050000)">Vender Lamborghini (R$1,050,000)</button>
+    <button onclick="vender('ferrari', 1400000)">Vender Ferrari (R$1,400,000)</button>
+    <button onclick="vender('iphone', 10500)">Vender iPhone (R$10,500)</button>
+    <button onclick="vender('samsung', 7000)">Vender Samsung (R$7,000)</button>
+    <button onclick="vender('fiatUno', 35000)">Vender Fiat Uno (R$35,000)</button>
+  </div>
+  <div id="bonus" style="display: none;">
+    <h2>Bônus</h2>
+    <p>Saldo: R$<span id="saldo-inventario-bonus">100</span></p>
+    <button onclick="comprarBonus(1, 5000, 0.4)">Aumentar Chance para 40% (R$5000)</button>
+    <button onclick="comprarBonus(2, 10000, 0.6)">Aumentar Chance para 60% (R$10000)</button>
+  </div>
+  <div id="itens" style="display: none;">
+    <h2>Meus Itens</h2>
+    <p>Gol: <span id="qtdGol">0</span></p>
+    <p>Fiat Uno com Escada: <span id="qtdUno">0</span></p>
+    <p>Casa Normal: <span id="qtdCasaNormal">0</span></p>
+    <p>Casa de Luxo: <span id="qtdCasaLuxo">0</span></p>
+    <p>Tesla: <span id="qtdTesla">0</span></p>
+    <p>Lamborghini: <span id="qtdLamborghini">0</span></p>
+    <p>Ferrari: <span id="qtdFerrari">0</span></p>
+    <p>iPhone: <span id="qtdIphone">0</span></p>
+    <p>Samsung: <span id="qtdSamsung">0</span></p>
+    <p>Fiat Uno: <span id="qtdFiatUno">0</span></p>
+  </div>
+  <button onclick="ocultarInventario()">Fechar Inventário</button>
+</div>
+
+<button onclick="recomecarJogo()">Recomeçar Jogo</button>
+
+<script>
+  let saldo = 100;
+  let inventario = {
+    gol: 0,
+    unoComEscada: 0,
+    casaNormal: 0,
+    casaLuxo: 0,
+    tesla: 0,
+    lamborghini: 0,
+    ferrari: 0,
+    iphone: 0,
+    samsung: 0,
+    fiatUno: 0
+  };
+  let bonusComprados = {
+    1: false,
+    2: false
+  };
+  let chanceAtual = 0.25;
+
+  function atualizarSaldo() {
+    document.getElementById('saldo').innerText = saldo.toFixed(2);
+    document.getElementById('saldo-inventario').innerText = saldo.toFixed(2);
+    document.getElementById('saldo-inventario-bonus').innerText = saldo.toFixed(2);
+  }
+
+  function verificarGameOver() {
+    if (saldo <= 0) {
+      document.getElementById('game-container').innerHTML = '<h1>Game Over!</h1>';
+    }
+  }
+
+  function mostrarInventario() {
+    document.getElementById('game-container').style.display = 'none';
+    document.getElementById('inventory').style.display = 'block';
+    atualizarItens();
+  }
+
+  function ocultarInventario() {
+    document.getElementById('game-container').style.display = 'block';
+    document.getElementById('inventory').style.display = 'none';
+  }
+
+  function mostrarComprarEVender(tab) {
+    document.getElementById('comprar').style.display = tab === 'comprar' ? 'block' : 'none';
+    document.getElementById('vender').style.display = tab === 'vender' ? 'block' : 'none';
+    document.getElementById('bonus').style.display = 'none';
+    document.getElementById('itens').style.display = 'none';
+  }
+
+  function mostrarBonus() {
+    document.getElementById('bonus').style.display = 'block';
+    document.getElementById('comprar').style.display = 'none';
+    document.getElementById('vender').style.display = 'none';
+    document.getElementById('itens').style.display = 'none';
+  }
+
+  function mostrarItens() {
+    document.getElementById('itens').style.display = 'block';
+    document.getElementById('comprar').style.display = 'none';
+    document.getElementById('vender').style.display = 'none';
+    document.getElementById('bonus').style.display = 'none';
+  }
+
+  function atualizarItens() {
+    document.getElementById('qtdGol').innerText = inventario.gol;
+    document.getElementById('qtdUno').innerText = inventario.unoComEscada;
+    document.getElementById('qtdCasaNormal').innerText = inventario.casaNormal;
+    document.getElementById('qtdCasaLuxo').innerText = inventario.casaLuxo;
+    document.getElementById('qtdTesla').innerText = inventario.tesla;
+    document.getElementById('qtdLamborghini').innerText = inventario.lamborghini;
+    document.getElementById('qtdFerrari').innerText = inventario.ferrari;
+    document.getElementById('qtdIphone').innerText = inventario.iphone;
+    document.getElementById('qtdSamsung').innerText = inventario.samsung;
+    document.getElementById('qtdFiatUno').innerText = inventario.fiatUno;
+  }
+
+  function comprar(item, preco) {
+    if (saldo >= preco) {
+      saldo -= preco;
+      inventario[item]++;
+      atualizarSaldo();
+      atualizarItens();
+    } else {
+      alert('Saldo insuficiente.');
+    }
+  }
+
+  function vender(item, preco) {
+    if (inventario[item] > 0) {
+      saldo += preco * 0.7; // Valor de venda ajustado para 70%
+      inventario[item]--;
+      atualizarSaldo();
+      atualizarItens();
+    } else {
+      alert('Você não possui este item para vender.');
+    }
+  }
+
+  function comprarBonus(id, preco, novaChance) {
+    if (!bonusComprados[id] && saldo >= preco) {
+      bonusComprados[id] = true;
+      chanceAtual = novaChance;
+      saldo -= preco;
+      atualizarSaldo();
+      alert(`Você comprou o bônus ${id}! Sua chance atual é de ${novaChance * 100}%.`);
+    } else {
+      alert('Bônus já comprado ou saldo insuficiente.');
+    }
+  }
+
+  function reiniciar() {
+    document.getElementById('resultado').innerText = '';
+  }
+
+  function apostar(valor) {
+    const chanceDeGanhar = Math.random() <= chanceAtual;
+
+    if (chanceDeGanhar) {
+      const premio = valor * 9;
+      saldo += premio - valor;
+      document.getElementById('resultado').innerText = `Parabéns! Você ganhou R$${premio}.`;
+    } else {
+      saldo -= valor;
+      document.getElementById('resultado').innerText = `Você perdeu R$${valor}. Tente novamente.`;
+    }
+
+    atualizarSaldo();
+    verificarGameOver();
+  }
+
+  function recomecarJogo() {
+    location.reload();
+  }
+</script>
+
+</body>
+</html>
